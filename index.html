@@ -8,106 +8,108 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <button id="themeToggle" class="theme-toggle" title="切换主题">
+  <button id="localeToggle" class="locale-toggle" type="button" title="Switch language" data-i18n-title="locale.toggle">
+    <span class="locale-icon" aria-hidden="true">🌐</span>
+    <span id="localeCurrent" class="locale-current">English</span>
+  </button>
+
+  <button id="themeToggle" class="theme-toggle" title="切换主题" data-i18n-title="theme.toggle">
     <span id="themeIcon">🌓</span>
     <span id="themeText">跟随系统</span>
   </button>
 
   <div class="container">
-    <h1>🎬 视频压缩工具</h1>
-    <p class="subtitle">使用 WebAssembly 在浏览器中压缩视频</p>
+    <header class="header">
+      <h1 data-i18n="app.title">🎬 视频压缩工具</h1>
+      <p class="subtitle" data-i18n="app.subtitle">使用 WebAssembly 在浏览器中安全压缩视频</p>
+    </header>
 
-    <div class="upload-area">
+    <div class="upload-area" id="uploadArea">
       <input type="file" id="videoInput" accept="video/*">
-      <label for="videoInput" class="upload-btn">选择视频文件</label>
+      <label for="videoInput" class="upload-label">
+        <span class="upload-icon">📁</span>
+        <span class="upload-text">
+          <span data-i18n="upload.button">点击选择视频文件</span><br>
+          <small data-i18n="upload.hint">支持拖拽上传</small>
+        </span>
+      </label>
     </div>
 
     <div id="videoInfo" class="video-info hidden">
-      <p id="fileName" style="font-weight: bold; margin-bottom: 10px; color: #333;"></p>
+      <p id="fileName" class="file-name"></p>
     </div>
-
-    <style>
-      .dark-mode #fileName {
-        color: #fff !important;
-      }
-    </style>
 
     <div class="controls">
       <div class="control-group">
-        <label>快速预设:</label>
-        <div style="display: flex; gap: 10px;">
-          <button id="presetLow" class="preset-btn" style="flex: 1; padding: 8px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🔴 最低</button>
-          <button id="presetMid" class="preset-btn" style="flex: 1; padding: 8px; background: #ffd93d; color: #333; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🟡 中等</button>
-          <button id="presetHigh" class="preset-btn" style="flex: 1; padding: 8px; background: #6bcf7f; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🟢 最高</button>
+        <label data-i18n="controls.preset.label">快速预设质量:</label>
+        <div class="preset-group">
+          <button id="presetLow" class="preset-btn low" data-i18n="controls.preset.low">🔴 最低质量</button>
+          <button id="presetMid" class="preset-btn mid" data-i18n="controls.preset.mid">🟡 中等质量</button>
+          <button id="presetHigh" class="preset-btn high" data-i18n="controls.preset.high">🟢 最高质量</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="control-group">
+          <label data-i18n="controls.resolution.label">分辨率:</label>
+          <select id="resolution">
+            <option value="auto" data-i18n="controls.resolution.auto">自动</option>
+            <option value="240" data-i18n="controls.resolution.240">240p (超低)</option>
+            <option value="360" data-i18n="controls.resolution.360">360p (极低)</option>
+            <option value="480" data-i18n="controls.resolution.480">480p (低)</option>
+            <option value="720" data-i18n="controls.resolution.720">720p</option>
+            <option value="1280" data-i18n="controls.resolution.1280">1280p</option>
+            <option value="1920" data-i18n="controls.resolution.1920">1920p</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label data-i18n="controls.framerate.label">帧率 (fps):</label>
+          <select id="framerate">
+            <option value="auto" data-i18n="controls.framerate.auto">自动</option>
+            <option value="5" data-i18n="controls.framerate.5">5 fps (超低)</option>
+            <option value="10" data-i18n="controls.framerate.10">10 fps (低)</option>
+            <option value="15" data-i18n="controls.framerate.15">15 fps (较低)</option>
+            <option value="24" data-i18n="controls.framerate.24">24 fps (电影)</option>
+            <option value="30" data-i18n="controls.framerate.30">30 fps (标准)</option>
+            <option value="60" data-i18n="controls.framerate.60">60 fps (高清)</option>
+          </select>
         </div>
       </div>
 
       <div class="control-group">
-        <label>分辨率:</label>
-        <select id="resolution">
-          <option value="auto">自动</option>
-          <option value="240">240p (超低)</option>
-          <option value="360">360p (极低)</option>
-          <option value="480">480p (低)</option>
-          <option value="720">720p</option>
-          <option value="1280">1280p</option>
-          <option value="1920">1920p</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <label>音质 (kbps):</label>
+        <label data-i18n="controls.audioBitrate.label">音质 (kbps):</label>
         <select id="audioBitrate">
-          <option value="16">16 kbps (超超低)</option>
-          <option value="24">24 kbps (超低)</option>
-          <option value="32">32 kbps (极低)</option>
-          <option value="48">48 kbps (很低)</option>
-          <option value="64">64 kbps (低)</option>
-          <option value="96">96 kbps</option>
-          <option value="128" selected>128 kbps (默认)</option>
-          <option value="192">192 kbps</option>
-          <option value="256">256 kbps (高)</option>
+          <option value="16" data-i18n="controls.audioBitrate.16">16 kbps (超超低)</option>
+          <option value="24" data-i18n="controls.audioBitrate.24">24 kbps (超低)</option>
+          <option value="32" data-i18n="controls.audioBitrate.32">32 kbps (极低)</option>
+          <option value="48" data-i18n="controls.audioBitrate.48">48 kbps (很低)</option>
+          <option value="64" data-i18n="controls.audioBitrate.64">64 kbps (低)</option>
+          <option value="96" data-i18n="controls.audioBitrate.96">96 kbps</option>
+          <option value="128" selected data-i18n="controls.audioBitrate.128">128 kbps (默认)</option>
+          <option value="192" data-i18n="controls.audioBitrate.192">192 kbps</option>
+          <option value="256" data-i18n="controls.audioBitrate.256">256 kbps (高)</option>
         </select>
       </div>
 
-      <div class="control-group">
-        <label>帧率 (fps):</label>
-        <select id="framerate">
-          <option value="auto">自动</option>
-          <option value="5">5 fps (超低)</option>
-          <option value="10">10 fps (低)</option>
-          <option value="15">15 fps (较低)</option>
-          <option value="24">24 fps (电影)</option>
-          <option value="30">30 fps (标准)</option>
-          <option value="60">60 fps (高清)</option>
-        </select>
+      <div class="estimate-info-box">
+        <p id="estimateInfo" data-i18n="estimate.default">📦 预估文件大小: 上传视频后显示</p>
       </div>
 
-      <div class="control-group">
-        <p id="estimateInfo" style="font-size: 1.1em; font-weight: bold; margin: 15px 0; padding: 10px; background: #f0f0f0; border-radius: 4px; text-align: center;">📦 预估文件大小: 上传视频后显示</p>
-      </div>
-
-      <style>
-        .dark-mode #estimateInfo {
-          background: #333 !important;
-          color: #fff !important;
-        }
-      </style>
-
-      <button id="compressBtn" class="compress-btn">开始压缩</button>
+      <button id="compressBtn" class="compress-btn" data-i18n="actions.compress">开始压缩</button>
     </div>
 
     <div id="progress" class="progress hidden">
       <div class="progress-bar">
         <div id="progressFill" class="progress-fill"></div>
       </div>
-      <p id="progressText">准备中...</p>
+      <p id="progressText" data-i18n="progress.preparing">准备中...</p>
     </div>
 
     <div id="result" class="result hidden">
-      <h3>✅ 压缩完成</h3>
+      <h3 data-i18n="result.title">✅ 压缩完成</h3>
       <p id="resultInfo"></p>
-      <button id="downloadBtn" class="download-btn">下载压缩后的视频</button>
+      <button id="downloadBtn" class="download-btn" data-i18n="actions.download">下载压缩后的视频</button>
     </div>
   </div>
 

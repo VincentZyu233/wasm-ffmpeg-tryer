@@ -1,14 +1,16 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { toBlobURL } from '@ffmpeg/util';
+import { applyI18n, getLocale, setLocale, t } from './i18n.js';
 
 // 主题切换
 const themes = {
-  auto: { icon: '🌓', text: '跟随系统' },
-  light: { icon: '☀️', text: '白天模式' },
-  dark: { icon: '🌙', text: '黑夜模式' }
+  auto: { icon: '🌓', textKey: 'theme.auto' },
+  light: { icon: '☀️', textKey: 'theme.light' },
+  dark: { icon: '🌙', textKey: 'theme.dark' }
 };
 
 let currentTheme = localStorage.getItem('theme') || 'auto';
+const localeOrder = ['en', 'zh-CN'];
 
 function applyTheme(theme) {
   const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -18,7 +20,7 @@ function applyTheme(theme) {
   const themeText = document.getElementById('themeText');
   if (themeIcon && themeText) {
     themeIcon.textContent = themes[theme].icon;
-    themeText.textContent = themes[theme].text;
+    themeText.textContent = t(themes[theme].textKey);
   }
 }
 
@@ -33,8 +35,6 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
   if (currentTheme === 'auto') applyTheme('auto');
 });
-
-applyTheme(currentTheme);
 
 // 视频压缩逻辑
 let ffmpeg = null;
@@ -57,6 +57,8 @@ const fileName = document.getElementById('fileName');
 const presetLow = document.getElementById('presetLow');
 const presetMid = document.getElementById('presetMid');
 const presetHigh = document.getElementById('presetHigh');
+const localeToggle = document.getElementById('localeToggle');
+const localeCurrent = document.getElementById('localeCurrent');
 
 let videoDuration = 0;
 const VIDEO_BITRATE_BY_RESOLUTION = {
@@ -69,11 +71,42 @@ const VIDEO_BITRATE_BY_RESOLUTION = {
   '240': 200,
 };
 
+applyTheme(currentTheme);
+applyI18n();
+setupLocaleToggle();
+
+window.addEventListener('localechange', () => {
+  applyTheme(currentTheme);
+  refreshLocaleToggle();
+  if (videoFile) {
+    fileName.textContent = t('file.selected', { name: videoFile.name });
+  }
+  if (result.classList.contains('hidden')) {
+    updateEstimate();
+  }
+});
+
+function setupLocaleToggle() {
+  refreshLocaleToggle();
+  localeToggle?.addEventListener('click', () => {
+    const currentLocale = getLocale();
+    const nextIndex = (localeOrder.indexOf(currentLocale) + 1) % localeOrder.length;
+    setLocale(localeOrder[nextIndex]);
+  });
+}
+
+function refreshLocaleToggle() {
+  const currentLocale = getLocale();
+  if (localeCurrent) {
+    localeCurrent.textContent = t(`locale.option.${currentLocale}`);
+  }
+}
+
 videoInput.addEventListener('change', (e) => {
   videoFile = e.target.files[0];
   if (videoFile) {
     result.classList.add('hidden');
-    fileName.textContent = `📁 ${videoFile.name}`;
+    fileName.textContent = t('file.selected', { name: videoFile.name });
     videoInfo.classList.remove('hidden');
     getVideoDuration();
   }
@@ -91,7 +124,7 @@ async function getVideoDuration() {
 
 function updateEstimate() {
   if (!videoDuration) {
-    estimateInfo.textContent = '预估文件大小: 计算中...';
+    estimateInfo.textContent = t('estimate.pending');
     return;
   }
 
@@ -100,7 +133,11 @@ function updateEstimate() {
   const totalBitrate = videoBitrate + audioBitrateKbps;
   const estimatedSize = (totalBitrate * videoDuration / 8 / 1024).toFixed(2);
 
-  estimateInfo.textContent = `预估文件大小: ${estimatedSize} MB (视频: ${videoBitrate}k + 音频: ${audioBitrateKbps}k)`;
+  estimateInfo.textContent = t('estimate.result', {
+    estimatedSize,
+    videoBitrate,
+    audioBitrate: audioBitrateKbps,
+  });
 }
 
 audioBitrate.addEventListener('change', updateEstimate);
@@ -141,7 +178,7 @@ compressBtn.addEventListener('click', async () => {
     await loadFFmpeg();
     await compressVideo();
   } catch (error) {
-    alert('压缩失败: ' + error.message);
+    alert(t('errors.compressFailed', { message: error.message }));
     console.error(error);
   } finally {
     compressBtn.disabled = false;
@@ -152,7 +189,7 @@ compressBtn.addEventListener('click', async () => {
 async function loadFFmpeg() {
   if (ffmpeg) return;
 
-  progressText.textContent = '加载 FFmpeg...';
+  progressText.textContent = t('progress.loadingFfmpeg');
   progressFill.style.width = '10%';
 
   ffmpeg = new FFmpeg();
@@ -164,7 +201,7 @@ async function loadFFmpeg() {
   ffmpeg.on('progress', ({ progress: p }) => {
     const percent = Math.round(p * 100);
     progressFill.style.width = `${10 + percent * 0.9}%`;
-    progressText.textContent = `压缩中... ${percent}%`;
+    progressText.textContent = t('progress.compressing', { percent });
   });
 
   const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
@@ -175,7 +212,7 @@ async function loadFFmpeg() {
 }
 
 async function compressVideo() {
-  progressText.textContent = '准备文件...';
+  progressText.textContent = t('progress.preparingFile');
   progressFill.style.width = '10%';
 
   const inputName = 'input.mp4';
@@ -222,13 +259,17 @@ async function compressVideo() {
   const compressedSize = (blob.size / 1024 / 1024).toFixed(2);
   const ratio = ((1 - blob.size / videoFile.size) * 100).toFixed(1);
 
-  resultInfo.textContent = `原始大小: ${originalSize} MB → 压缩后: ${compressedSize} MB (减少 ${ratio}%)`;
+  resultInfo.textContent = t('result.summary', {
+    originalSize,
+    compressedSize,
+    ratio,
+  });
 
   downloadBtn.onclick = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `compressed_${videoFile.name}`;
+    a.download = `${t('download.filenamePrefix')}${videoFile.name}`;
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -1,101 +1,101 @@
-# 构建说明
+# Build Instructions
 
-本项目使用 GitHub Actions 进行自动化构建、部署和发布。
+This project uses GitHub Actions for automated building, deployment, and release.
 
-## 触发方式
+## Trigger Methods
 
-通过 **commit message** 中的关键词控制 CI/CD 行为：
+Control CI/CD behavior via **keywords in commit messages**:
 
-| Commit Message 关键词 | 构建 | 部署 GitHub Pages | 部署 Cloudflare Pages | 发布 Release |
-|----------------------|------|-------------------|-------------------|--------------|
-| `build action`       | ✅   | ❌                | ❌                | ❌           |
-| `build release`      | ✅   | ✅                | ✅                | ✅           |
-| 其他                 | ❌   | ❌                | ❌                | ❌           |
+| Commit Message Keyword | Build | Deploy GitHub Pages | Deploy Cloudflare Pages | Publish Release |
+|----------------------|:----:|:-------------------:|:-----------------------:|:---------------:|
+| `build action`       | ✅   | ❌                  | ❌                      | ❌              |
+| `build release`      | ✅   | ✅                  | ✅                      | ✅              |
+| Others               | ❌   | ❌                  | ❌                      | ❌              |
 
-## 使用示例
+## Usage Examples
 
-### 仅测试构建
+### Build Only
 
 ```bash
-git commit -m "build action: 测试 CI 流程"
+git commit -m "build action: test CI workflow"
 git push
 ```
 
-**效果**：触发构建，生成 dist 产物，但不部署也不发布
+**Result**: Triggers build, generates dist artifacts, no deployment or release.
 
-### 构建并发布
+### Build and Release
 
 ```bash
-git commit -m "build release: v0.1.0 新增视频压缩功能"
+git commit -m "build release: v0.1.0 add video compression feature"
 git push
 ```
 
-**效果**：
-1. ✅ 构建项目
-2. ✅ 部署到 GitHub Pages
-3. ✅ 创建 GitHub Release（包含 zip 压缩包）
+**Result**:
+1. ✅ Build project
+2. ✅ Deploy to GitHub Pages
+3. ✅ Create GitHub Release (includes zip archive)
 
-## 工作流程
+## Workflow
 
 ```
 check ──→ build ──→ deploy (GitHub Pages)
-                 └──→ release (GitHub Release)
+                  └──→ release (GitHub Release)
 ```
 
-### 1. check 任务
+### 1. check Job
 
-- 解析 commit message
-- 提取版本号（从 package.json）
-- 输出控制标志（should_build, should_release）
+- Parse commit message
+- Extract version number (from package.json)
+- Output control flags (should_build, should_release)
 
-### 2. build 任务
+### 2. build Job
 
-- 安装依赖（npm ci）
-- 构建项目（npm run build）
-- 上传 dist 产物
+- Install dependencies (npm ci)
+- Build project (npm run build)
+- Upload dist artifacts
 
-## 部署方式
+## Deployment
 
 ### GitHub Pages
 
-- **自动部署**：每次 `build release` 时自动部署
-- **访问地址**：`https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/`
-- **无需额外配置**
+- **Auto-deploy**: Deploys automatically on every `build release`
+- **URL**: `https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/`
+- **No additional configuration needed**
 
 ### Cloudflare Pages
 
-需要手动配置一次，之后自动部署。
+Requires one-time manual setup, then auto-deploys.
 
-#### 前置准备（首次操作）
+#### Prerequisites (First Time)
 
-1. 进入 [Cloudflare Dashboard](https://dash.cloudflare.com/) → **Workers & Pages**
-2. 点击 **Create application** → **Pages** 标签
-3. 选择 **Upload assets** → **开始使用** → **拖放文件**（Direct Upload 模式）
-4. 项目名称输入：`wasm-ffmpeg-tryer`
-5. 拖放或选择一个临时 `index.html` 文件完成初始化
-6. 在 GitHub 仓库 **Settings → Secrets and variables → Actions → Repository secrets** 添加：
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → **Workers & Pages**
+2. Click **Create application** → **Pages** tab
+3. Select **Upload assets** → **Get started** → **Drag and drop files** (Direct Upload mode)
+4. Project name: `wasm-ffmpeg-tryer`
+5. Drag and drop a temporary `index.html` file to initialize
+6. In the GitHub repository, go to **Settings → Secrets and variables → Actions → Repository secrets** and add:
 
-| Secret 名称 | 说明 | 获取方式 |
-|------------|------|--------|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API 令牌 | [🔗 API Tokens 管理](https://dash.cloudflare.com/profile/api-tokens)<br><br>**创建步骤：**<br>1. 点击 **Create Token**<br>2. 模板选择 **Edit Cloudflare Workers**<br>3. **权限 (Permissions)** 确保包含：<br>   - `Account` - `Cloudflare Pages` - `Edit` (必需)<br>   - `Zone` - `Workers Routes` - `Edit`<br>   - `Account` - `Workers Scripts` - `Edit`<br>   - `Account` - `Workers KV Storage` - `Edit`<br>4. **账户资源 (Account Resources)**：选择 `Include` → `你的账户名`<br>5. **区域资源 (Zone Resources)**：选择 `Include` → `All zones`<br>6. 点击 **Continue to summary** 并生成 Token |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 账户 ID | [🔗 打开此链接](https://dash.cloudflare.com/)<br><br>浏览器会重定向到 `https://dash.cloudflare.com/<account-id>/home/overview`<br>URL 中间的那串字母和数字就是你的 **Account ID** |
+| Secret Name | Description | How to Get |
+|------------|-------------|-----------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API Token | [🔗 API Tokens Management](https://dash.cloudflare.com/profile/api-tokens)<br><br>**Steps:**<br>1. Click **Create Token**<br>2. Template: **Edit Cloudflare Workers**<br>3. **Permissions** must include:<br>   - `Account` - `Cloudflare Pages` - `Edit` (required)<br>   - `Zone` - `Workers Routes` - `Edit`<br>   - `Account` - `Workers Scripts` - `Edit`<br>   - `Account` - `Workers KV Storage` - `Edit`<br>4. **Account Resources**: Select `Include` → `Your account name`<br>5. **Zone Resources**: Select `Include` → `All zones`<br>6. Click **Continue to summary** and generate token |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare Account ID | [🔗 Open this link](https://dash.cloudflare.com/)<br><br>Your browser will redirect to `https://dash.cloudflare.com/<account-id>/home/overview`<br>The alphanumeric string in the URL is your **Account ID** |
 
-#### 自动部署
+#### Auto-deploy
 
-配置完成后，每次 `build release` 时会自动部署到 Cloudflare Pages。
+Once configured, it will automatically deploy to Cloudflare Pages on every `build release`.
 
-**访问地址**：`https://wasm-ffmpeg-tryer.pages.dev/`
+**URL**: `https://wasm-ffmpeg-tryer.pages.dev/`
 
-### 4. release 任务
+### 4. release Job
 
-- 下载构建产物
-- 打包成 zip（`wasm-ffmpeg-tryer-v0.1.0.zip`）
-- 创建 GitHub Release
-- 附带下载链接和使用说明
+- Download build artifacts
+- Package into zip (`wasm-ffmpeg-tryer-v0.1.0.zip`)
+- Create GitHub Release
+- Attach download link and usage instructions
 
-## 版本号管理
+## Version Management
 
-版本号统一在 `package.json` 中维护：
+Version is maintained in `package.json`:
 
 ```json
 {
@@ -103,10 +103,10 @@ check ──→ build ──→ deploy (GitHub Pages)
 }
 ```
 
-CI 会自动读取并生成对应的 Release tag（如 `v0.1.0`）
+CI automatically reads it and generates the corresponding Release tag (e.g., `v0.1.0`).
 
-## 注意事项
+## Notes
 
-- PR 会自动触发构建测试，但不会部署或发布
-- 只有推送到 `main` 分支才会触发部署和发布
-- Release 会自动覆盖同版本的旧 Release（强制刷新）
+- PRs automatically trigger build tests, but will not deploy or release
+- Only pushes to the `main` branch trigger deployment and release
+- Releases automatically overwrite old releases with the same version (force refresh)
