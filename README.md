@@ -5,7 +5,9 @@
 > 一个纯前端的视频压缩工具，使用 FFmpeg.wasm 在浏览器中直接处理视频，无需上传到服务器，保护您的隐私。
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Online-222222?logo=githubpages&logoColor=white)](https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/) [https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/](https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/)
+</br>
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-Online-F38020?logo=cloudflarepages&logoColor=white)](https://wasm-ffmpeg-tryer.pages.dev/) [https://wasm-ffmpeg-tryer.pages.dev/](https://wasm-ffmpeg-tryer.pages.dev/)
+</br>
 [![Release](https://img.shields.io/github/v/release/VincentZyuApps/wasm-ffmpeg-tryer?display_name=release)](https://github.com/VincentZyuApps/wasm-ffmpeg-tryer/releases) [https://github.com/VincentZyuApps/wasm-ffmpeg-tryer/releases](https://github.com/VincentZyuApps/wasm-ffmpeg-tryer/releases)
 
 ## ✨ 功能特性
