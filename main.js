@@ -1,6 +1,42 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { toBlobURL } from '@ffmpeg/util';
 
+// 主题切换
+const themes = {
+  auto: { icon: '🌓', text: '跟随系统' },
+  light: { icon: '☀️', text: '白天模式' },
+  dark: { icon: '🌙', text: '黑夜模式' }
+};
+
+let currentTheme = localStorage.getItem('theme') || 'auto';
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.body.classList.toggle('dark-mode', isDark);
+
+  const themeIcon = document.getElementById('themeIcon');
+  const themeText = document.getElementById('themeText');
+  if (themeIcon && themeText) {
+    themeIcon.textContent = themes[theme].icon;
+    themeText.textContent = themes[theme].text;
+  }
+}
+
+document.getElementById('themeToggle')?.addEventListener('click', () => {
+  const order = ['auto', 'light', 'dark'];
+  const nextIndex = (order.indexOf(currentTheme) + 1) % order.length;
+  currentTheme = order[nextIndex];
+  localStorage.setItem('theme', currentTheme);
+  applyTheme(currentTheme);
+});
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (currentTheme === 'auto') applyTheme('auto');
+});
+
+applyTheme(currentTheme);
+
+// 视频压缩逻辑
 let ffmpeg = null;
 let videoFile = null;
 
@@ -15,6 +51,7 @@ const resultInfo = document.getElementById('resultInfo');
 const downloadBtn = document.getElementById('downloadBtn');
 const targetSize = document.getElementById('targetSize');
 const resolution = document.getElementById('resolution');
+const audioBitrate = document.getElementById('audioBitrate');
 
 videoInput.addEventListener('change', (e) => {
   videoFile = e.target.files[0];
@@ -60,7 +97,7 @@ async function loadFFmpeg() {
     progressText.textContent = `压缩中... ${percent}%`;
   });
 
-  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
   await ffmpeg.load({
     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
     wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
@@ -90,7 +127,7 @@ async function compressVideo() {
     '-c:v', 'libx264',
     '-preset', 'medium',
     '-c:a', 'aac',
-    '-b:a', '128k',
+    '-b:a', `${audioBitrate.value}k`,
   ];
 
   if (scaleFilter) {

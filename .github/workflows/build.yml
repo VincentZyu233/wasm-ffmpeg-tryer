@@ -108,6 +108,27 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  deploy-cloudflare:
+    name: Deploy to Cloudflare Pages
+    needs: [check, build]
+    if: needs.check.outputs.should_build == 'true' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: wasm-ffmpeg-tryer
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
   release:
     name: Create Release
     needs: [check, build]

@@ -23,6 +23,10 @@
 3. 点击"开始压缩"
 4. 等待处理完成后下载
 
+### 压缩过程演示
+
+![压缩中](./doc/images/preview.浏览器f12console.压缩中.png)
+
 ## 💻 本地开发
 
 ### 环境要求
@@ -52,11 +56,11 @@ npm run preview
 
 本项目使用 **commit message 关键词** 控制 CI/CD 流程，无需手动配置。
 
-| Commit Message 关键词 | 构建 | 部署 GitHub Pages | 发布 Release |
-|----------------------|:----:|:----------------:|:-----------:|
-| `build action`       | ✅   | ❌                | ❌           |
-| `build release`      | ✅   | ✅                | ✅           |
-| 其他                 | ❌   | ❌                | ❌           |
+| Commit Message 关键词 | 构建 | 部署 GitHub Pages | 部署 Cloudflare Pages | 发布 Release |
+|----------------------|:----:|:----------------:|:----------------:|:-----------:|
+| `build action`       | ✅   | ❌                | ❌                | ❌           |
+| `build release`      | ✅   | ✅                | ✅                | ✅           |
+| 其他                 | ❌   | ❌                | ❌                | ❌           |
 
 ### 使用示例
 
@@ -78,6 +82,25 @@ git push
 - **Vanilla JavaScript** - 无框架依赖，轻量高效
 - **GitHub Actions** - 自动化 CI/CD
 
+## 📚 依赖说明
+
+### WebAssembly (WASM) 是什么？
+
+WebAssembly 是一种二进制格式，可以在浏览器中以接近原生的速度运行。本项目使用 WASM 在浏览器端直接处理视频，无需服务器。
+
+### 核心依赖
+
+| 包名 | 版本 | 说明 |
+|------|------|------|
+| `@ffmpeg/core` | ^0.12.6 | FFmpeg 的 WebAssembly 编译版本（原始 C 代码编译成 WASM 二进制） |
+| `@ffmpeg/ffmpeg` | ^0.12.10 | JavaScript 包装器，提供友好的 API 调用 WASM 版 FFmpeg |
+| `@ffmpeg/util` | ^0.12.1 | 工具函数库，处理文件 Blob 转换、URL 生成等 |
+
+**工作流程**：
+1. `@ffmpeg/ffmpeg` 加载 `@ffmpeg/core` 的 WASM 文件
+2. 通过 JavaScript API 调用 FFmpeg 功能
+3. `@ffmpeg/util` 辅助处理文件和数据转换
+
 ## 📦 部署方式
 
 ### GitHub Pages（在线访问）
@@ -86,6 +109,15 @@ git push
 ```
 https://[your-username].github.io/wasm-ffmpeg-tryer/
 ```
+
+### Cloudflare Pages（在线访问）
+
+自动部署到 Cloudflare Pages，访问地址：
+```
+https://wasm-ffmpeg-tryer.pages.dev/
+```
+
+需要先配置 Secrets，详见 [.github/workflows/build.md](.github/workflows/build.md)
 
 ### Release 下载（离线使用）
 

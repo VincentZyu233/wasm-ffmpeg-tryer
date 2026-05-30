@@ -4,9 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>视频压缩工具 - Video Compressor</title>
+  <link rel="icon" type="image/png" href="/assets/ffmpeg.logo.png">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+  <button id="themeToggle" class="theme-toggle" title="切换主题">
+    <span id="themeIcon">🌓</span>
+    <span id="themeText">跟随系统</span>
+  </button>
+
   <div class="container">
     <h1>🎬 视频压缩工具</h1>
     <p class="subtitle">使用 WebAssembly 在浏览器中压缩视频</p>
@@ -30,6 +36,17 @@
           <option value="1280">1280p</option>
           <option value="720">720p</option>
           <option value="480">480p</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>音质 (kbps):</label>
+        <select id="audioBitrate">
+          <option value="64">64 kbps (低)</option>
+          <option value="96">96 kbps</option>
+          <option value="128" selected>128 kbps (默认)</option>
+          <option value="192">192 kbps</option>
+          <option value="256">256 kbps (高)</option>
         </select>
       </div>
 
