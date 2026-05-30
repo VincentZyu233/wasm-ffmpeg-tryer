@@ -23,38 +23,45 @@
     </div>
 
     <div id="videoInfo" class="video-info hidden">
-      <p id="fileName" style="font-weight: bold; margin-bottom: 10px;"></p>
-      <div id="thumbnails" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;"></div>
+      <p id="fileName" style="font-weight: bold; margin-bottom: 10px; color: #333;"></p>
     </div>
+
+    <style>
+      .dark-mode #fileName {
+        color: #fff !important;
+      }
+    </style>
 
     <div class="controls">
       <div class="control-group">
-        <label>目标大小 (MB):</label>
-        <select id="targetSize">
-          <option value="5">5 MB</option>
-          <option value="10" selected>10 MB (默认)</option>
-          <option value="20">20 MB</option>
-          <option value="50">50 MB</option>
-          <option value="100">100 MB</option>
-        </select>
+        <label>快速预设:</label>
+        <div style="display: flex; gap: 10px;">
+          <button id="presetLow" class="preset-btn" style="flex: 1; padding: 8px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🔴 最低</button>
+          <button id="presetMid" class="preset-btn" style="flex: 1; padding: 8px; background: #ffd93d; color: #333; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🟡 中等</button>
+          <button id="presetHigh" class="preset-btn" style="flex: 1; padding: 8px; background: #6bcf7f; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🟢 最高</button>
+        </div>
       </div>
 
       <div class="control-group">
-        <label>或设置分辨率:</label>
+        <label>分辨率:</label>
         <select id="resolution">
           <option value="auto">自动</option>
-          <option value="1920">1920p</option>
-          <option value="1280">1280p</option>
+          <option value="240">240p (超低)</option>
+          <option value="360">360p (极低)</option>
+          <option value="480">480p (低)</option>
           <option value="720">720p</option>
-          <option value="480">480p</option>
+          <option value="1280">1280p</option>
+          <option value="1920">1920p</option>
         </select>
       </div>
 
       <div class="control-group">
         <label>音质 (kbps):</label>
         <select id="audioBitrate">
-          <option value="32">32 kbps (超低)</option>
-          <option value="48">48 kbps (极低)</option>
+          <option value="16">16 kbps (超超低)</option>
+          <option value="24">24 kbps (超低)</option>
+          <option value="32">32 kbps (极低)</option>
+          <option value="48">48 kbps (很低)</option>
           <option value="64">64 kbps (低)</option>
           <option value="96">96 kbps</option>
           <option value="128" selected>128 kbps (默认)</option>
@@ -77,8 +84,15 @@
       </div>
 
       <div class="control-group">
-        <p id="estimateInfo" style="color: #666; font-size: 0.9em; margin: 10px 0;">预估文件大小: 上传视频后显示</p>
+        <p id="estimateInfo" style="font-size: 1.1em; font-weight: bold; margin: 15px 0; padding: 10px; background: #f0f0f0; border-radius: 4px; text-align: center;">📦 预估文件大小: 上传视频后显示</p>
       </div>
+
+      <style>
+        .dark-mode #estimateInfo {
+          background: #333 !important;
+          color: #fff !important;
+        }
+      </style>
 
       <button id="compressBtn" class="compress-btn">开始压缩</button>
     </div>
