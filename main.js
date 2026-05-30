@@ -133,6 +133,7 @@ compressBtn.addEventListener('click', async () => {
   if (!videoFile) return;
 
   compressBtn.disabled = true;
+  videoInput.disabled = true;
   progress.classList.remove('hidden');
   result.classList.add('hidden');
 
@@ -144,6 +145,7 @@ compressBtn.addEventListener('click', async () => {
     console.error(error);
   } finally {
     compressBtn.disabled = false;
+    videoInput.disabled = false;
   }
 });
 
