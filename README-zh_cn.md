@@ -4,7 +4,7 @@
 
 🎬 基于 WebAssembly 的浏览器端视频压缩工具
 
-> 一个纯前端的视频压缩工具，使用 FFmpeg.wasm 在浏览器中直接处理视频，无需上传到服务器，保护您的隐私。
+> 一个纯前端的视频压缩工具，使用 FFmpeg.wasm 在浏览器中直接处理视频，无需上传到服务器，保护您的数据隐私。
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Online-222222?style=for-the-badge&logo=githubpages&logoColor=white)](https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/) [https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/](https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/)
 </br>

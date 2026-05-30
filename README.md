@@ -4,7 +4,7 @@
 
 🎬 A WebAssembly-powered browser-side video compression tool
 
-> A pure frontend video compression tool that uses FFmpeg.wasm to process videos directly in the browser — no uploads to any server, protecting your privacy.
+> A pure frontend video compression tool that uses FFmpeg.wasm to process videos directly in the browser — no uploads to any server, keeping your data private.
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Online-222222?style=for-the-badge&logo=githubpages&logoColor=white)](https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/) [https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/](https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/)
 </br>
