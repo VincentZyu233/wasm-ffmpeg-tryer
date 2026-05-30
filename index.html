@@ -22,10 +22,21 @@
       <label for="videoInput" class="upload-btn">选择视频文件</label>
     </div>
 
-    <div id="controls" class="controls hidden">
+    <div id="videoInfo" class="video-info hidden">
+      <p id="fileName" style="font-weight: bold; margin-bottom: 10px;"></p>
+      <div id="thumbnails" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;"></div>
+    </div>
+
+    <div class="controls">
       <div class="control-group">
         <label>目标大小 (MB):</label>
-        <input type="number" id="targetSize" value="10" min="1" max="500">
+        <select id="targetSize">
+          <option value="5">5 MB</option>
+          <option value="10" selected>10 MB (默认)</option>
+          <option value="20">20 MB</option>
+          <option value="50">50 MB</option>
+          <option value="100">100 MB</option>
+        </select>
       </div>
 
       <div class="control-group">
@@ -42,12 +53,31 @@
       <div class="control-group">
         <label>音质 (kbps):</label>
         <select id="audioBitrate">
+          <option value="32">32 kbps (超低)</option>
+          <option value="48">48 kbps (极低)</option>
           <option value="64">64 kbps (低)</option>
           <option value="96">96 kbps</option>
           <option value="128" selected>128 kbps (默认)</option>
           <option value="192">192 kbps</option>
           <option value="256">256 kbps (高)</option>
         </select>
+      </div>
+
+      <div class="control-group">
+        <label>帧率 (fps):</label>
+        <select id="framerate">
+          <option value="auto">自动</option>
+          <option value="5">5 fps (超低)</option>
+          <option value="10">10 fps (低)</option>
+          <option value="15">15 fps (较低)</option>
+          <option value="24">24 fps (电影)</option>
+          <option value="30">30 fps (标准)</option>
+          <option value="60">60 fps (高清)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <p id="estimateInfo" style="color: #666; font-size: 0.9em; margin: 10px 0;">预估文件大小: 上传视频后显示</p>
       </div>
 
       <button id="compressBtn" class="compress-btn">开始压缩</button>

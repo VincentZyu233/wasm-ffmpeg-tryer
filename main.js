@@ -41,7 +41,6 @@ let ffmpeg = null;
 let videoFile = null;
 
 const videoInput = document.getElementById('videoInput');
-const controls = document.getElementById('controls');
 const compressBtn = document.getElementById('compressBtn');
 const progress = document.getElementById('progress');
 const progressFill = document.getElementById('progressFill');
@@ -52,14 +51,90 @@ const downloadBtn = document.getElementById('downloadBtn');
 const targetSize = document.getElementById('targetSize');
 const resolution = document.getElementById('resolution');
 const audioBitrate = document.getElementById('audioBitrate');
+const framerate = document.getElementById('framerate');
+const estimateInfo = document.getElementById('estimateInfo');
+const videoInfo = document.getElementById('videoInfo');
+const fileName = document.getElementById('fileName');
+const thumbnails = document.getElementById('thumbnails');
+
+let videoDuration = 0;
 
 videoInput.addEventListener('change', (e) => {
   videoFile = e.target.files[0];
   if (videoFile) {
-    controls.classList.remove('hidden');
     result.classList.add('hidden');
+    fileName.textContent = `📁 ${videoFile.name}`;
+    videoInfo.classList.remove('hidden');
+    getVideoDuration();
+    extractThumbnails();
   }
 });
+
+async function getVideoDuration() {
+  const video = document.createElement('video');
+  video.src = URL.createObjectURL(videoFile);
+  video.onloadedmetadata = () => {
+    videoDuration = video.duration;
+    updateEstimate();
+    URL.revokeObjectURL(video.src);
+  };
+}
+
+async function extractThumbnails() {
+  await loadFFmpeg();
+
+  const inputName = 'input.mp4';
+  await ffmpeg.writeFile(inputName, new Uint8Array(await videoFile.arrayBuffer()));
+
+  thumbnails.innerHTML = '';
+
+  // 提取三个时间点：1/4, 1/2, 3/4
+  const times = [videoDuration / 4, videoDuration / 2, (videoDuration * 3) / 4];
+
+  for (let i = 0; i < times.length; i++) {
+    const time = times[i];
+    const outputName = `thumb_${i}.png`;
+
+    await ffmpeg.exec([
+      '-i', inputName,
+      '-ss', time.toString(),
+      '-vframes', '1',
+      '-vf', 'scale=120:-1',
+      outputName
+    ]);
+
+    const data = await ffmpeg.readFile(outputName);
+    const blob = new Blob([data.buffer], { type: 'image/png' });
+    const url = URL.createObjectURL(blob);
+
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.height = '100px';
+    img.style.borderRadius = '4px';
+    img.title = `${(time / videoDuration * 100).toFixed(0)}%`;
+    thumbnails.appendChild(img);
+  }
+}
+
+function updateEstimate() {
+  if (!videoDuration) {
+    estimateInfo.textContent = '预估文件大小: 计算中...';
+    return;
+  }
+
+  const targetSizeMB = parseInt(targetSize.value);
+  const targetBitrate = Math.floor((targetSizeMB * 8192) / videoDuration);
+  const audioBitrateMbps = parseInt(audioBitrate.value);
+  const totalBitrate = targetBitrate + audioBitrateMbps;
+  const estimatedSize = (totalBitrate * videoDuration / 8 / 1024).toFixed(2);
+
+  estimateInfo.textContent = `预估文件大小: ${estimatedSize} MB (视频: ${targetBitrate}k + 音频: ${audioBitrateMbps}k)`;
+}
+
+targetSize.addEventListener('change', updateEstimate);
+audioBitrate.addEventListener('change', updateEstimate);
+framerate.addEventListener('change', updateEstimate);
+resolution.addEventListener('change', updateEstimate);
 
 compressBtn.addEventListener('click', async () => {
   if (!videoFile) return;
@@ -129,6 +204,10 @@ async function compressVideo() {
     '-c:a', 'aac',
     '-b:a', `${audioBitrate.value}k`,
   ];
+
+  if (framerate.value !== 'auto') {
+    args.push('-r', framerate.value);
+  }
 
   if (scaleFilter) {
     args.push(...scaleFilter.split(' '));

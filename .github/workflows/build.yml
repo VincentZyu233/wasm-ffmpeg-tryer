@@ -127,7 +127,6 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: wasm-ffmpeg-tryer
           directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     name: Create Release
