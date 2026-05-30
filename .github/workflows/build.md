@@ -59,7 +59,7 @@ check ──→ build ──→ deploy (GitHub Pages)
 ### GitHub Pages
 
 - **自动部署**：每次 `build release` 时自动部署
-- **访问地址**：`https://[username].github.io/wasm-ffmpeg-tryer/`
+- **访问地址**：`https://VincentZyuApps.github.io/wasm-ffmpeg-tryer/`
 - **无需额外配置**
 
 ### Cloudflare Pages

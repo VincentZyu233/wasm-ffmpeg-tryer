@@ -146,29 +146,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ needs.check.outputs.version }}"
-          cat > release_notes.md << 'EOF'
-          ## 🎬 视频压缩工具 ${VERSION}
-
-          基于 WebAssembly 的浏览器端视频压缩工具
-
-          ### 📥 使用方式
-
-          **在线使用**: https://${{ github.repository_owner }}.github.io/wasm-ffmpeg-tryer/
-
-          **离线使用**: 下载下方的 zip 包，解压后打开 `index.html`
-
-          ### ✨ 功能特性
-
-          - ✅ 纯浏览器端处理，数据不上传
-          - ✅ 支持自定义目标大小
-          - ✅ 支持调整分辨率
-          - ✅ 实时进度显示
-
-          ---
-
-          **构建时间**: $(date -u '+%Y-%m-%d %H:%M UTC')
-          EOF
-
+          REPO="${{ github.repository }}"
+          sed -e "s|__VERSION__|${VERSION}|g" \
+              -e "s|__REPO__|${REPO}|g" \
+              -e "s|__BUILD_TIME__|$(date -u '+%Y-%m-%d %H:%M UTC')|g" \
+              .github/release_template.md > release_notes.md
           gh release create "$VERSION" \
             --title "wasm-ffmpeg-tryer ${VERSION}" \
             --notes-file release_notes.md \
