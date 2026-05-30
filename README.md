@@ -45,6 +45,10 @@
 
 ![Estimated vs Actual](./doc/images/preview.压缩完成以后.预估和实际的大小对比.png)
 
+**Download complete** — Click the button to download the compressed video from your browser
+
+![Download](./doc/images/preview.压缩完成以后.可以点击按钮从浏览器下载到本次磁盘捏.png)
+
 ## 💻 Local Development
 
 ### Requirements
